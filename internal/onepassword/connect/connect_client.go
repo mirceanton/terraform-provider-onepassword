@@ -261,6 +261,20 @@ func (c *Client) GetFileContent(_ context.Context, file *model.ItemFile, itemUUI
 	return content, err
 }
 
+var errConnectVaultCRUDNotSupported = fmt.Errorf("vault create/update/delete operations are not supported with 1Password Connect. Use a service account token or desktop app integration instead")
+
+func (c *Client) CreateVault(_ context.Context, vault *model.Vault) (*model.Vault, error) {
+	return nil, errConnectVaultCRUDNotSupported
+}
+
+func (c *Client) UpdateVault(_ context.Context, vault *model.Vault) (*model.Vault, error) {
+	return nil, errConnectVaultCRUDNotSupported
+}
+
+func (c *Client) DeleteVault(_ context.Context, uuid string) error {
+	return errConnectVaultCRUDNotSupported
+}
+
 func NewClient(connectHost, connectToken string, config Config) *Client {
 	return &Client{
 		connectClient: connect.NewClientWithUserAgent(connectHost, connectToken, config.ProviderUserAgent),

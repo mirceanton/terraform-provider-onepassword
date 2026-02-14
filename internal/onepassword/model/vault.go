@@ -30,3 +30,29 @@ func (v *Vault) FromSDKVault(vault *sdk.VaultOverview) {
 	v.Name = vault.Title
 	v.Description = vault.Description
 }
+
+func (v *Vault) FromSDKFullVault(vault *sdk.Vault) {
+	v.ID = vault.ID
+	v.Name = vault.Title
+	v.Description = vault.Description
+}
+
+func (v *Vault) ToSDKCreateParams() sdk.VaultCreateParams {
+	params := sdk.VaultCreateParams{
+		Title: v.Name,
+	}
+	if v.Description != "" {
+		desc := v.Description
+		params.Description = &desc
+	}
+	return params
+}
+
+func (v *Vault) ToSDKUpdateParams() sdk.VaultUpdateParams {
+	title := v.Name
+	desc := v.Description
+	return sdk.VaultUpdateParams{
+		Title:       &title,
+		Description: &desc,
+	}
+}

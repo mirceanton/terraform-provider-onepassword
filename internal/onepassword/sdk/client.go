@@ -210,6 +210,47 @@ func (c *Client) GetFileContent(ctx context.Context, file *model.ItemFile, itemU
 	return content, nil
 }
 
+func (c *Client) CreateVault(ctx context.Context, vault *model.Vault) (*model.Vault, error) {
+	params := vault.ToSDKCreateParams()
+
+	sdkVault, err := c.sdkClient.Vaults().Create(ctx, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create vault using sdk: %w", err)
+	}
+
+	v := &model.Vault{}
+	v.FromSDKFullVault(&sdkVault)
+	return v, nil
+}
+
+func (c *Client) UpdateVault(ctx context.Context, vault *model.Vault) (*model.Vault, error) {
+	params := vault.ToSDKUpdateParams()
+
+	var sdkVault sdk.Vault
+	err := util.RetryOnConflict(ctx, func() error {
+		var updateErr error
+		sdkVault, updateErr = c.sdkClient.Vaults().Update(ctx, vault.ID, params)
+		return updateErr
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to update vault using sdk: %w", err)
+	}
+
+	v := &model.Vault{}
+	v.FromSDKFullVault(&sdkVault)
+	return v, nil
+}
+
+func (c *Client) DeleteVault(ctx context.Context, uuid string) error {
+	err := util.RetryOnConflict(ctx, func() error {
+		return c.sdkClient.Vaults().Delete(ctx, uuid)
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete vault using sdk: %w", err)
+	}
+	return nil
+}
+
 func NewClient(ctx context.Context, config SDKConfig) (*Client, error) {
 	var sdkClient *sdk.Client
 	var err error

@@ -19,6 +19,9 @@ type Client interface {
 	UpdateItem(ctx context.Context, item *model.Item, vaultUuid string) (*model.Item, error)
 	DeleteItem(ctx context.Context, item *model.Item, vaultUuid string) error
 	GetFileContent(ctx context.Context, file *model.ItemFile, itemUUid, vaultUuid string) ([]byte, error)
+	CreateVault(ctx context.Context, vault *model.Vault) (*model.Vault, error)
+	UpdateVault(ctx context.Context, vault *model.Vault) (*model.Vault, error)
+	DeleteVault(ctx context.Context, uuid string) error
 }
 
 type ClientConfig struct {
